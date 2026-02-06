@@ -397,32 +397,6 @@ class OrdersDeleteView(DeleteView):
     success_url = reverse_lazy("shopapp:orders_list")
 
 
-class OrdersExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
-    """View для выгрузки товаров в формате JsonResponse"""
-    permission_required = "shopapp.view_order"
-
-    def test_func(self):
-        """Разрешение только для staff пользователей"""
-        return self.request.user.is_staff
-
-    def get(self, request: HttpRequest) -> JsonResponse:
-        """Get - запрос. Получает страницу с JSON ответом"""
-        orders: Order = Order.objects.select_related("user").prefetch_related("products").all()
-        orders_data = [
-            {
-                "pk": order.pk,
-                "delivery_adress": order.delivery_adress,
-                "promocode": order.promocode,
-                "created_at": str(order.created_at),
-                "user": order.user.id,
-                "products": [product.id for product in order.products.all()
-                             ]
-            } for order in orders
-        ]
-
-        return JsonResponse({"orders": orders_data})
-
-
 class UserOrdersListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Страница заказа пользоваеля"""
     template_name = "shopapp/user_orders_list.html"
@@ -465,6 +439,57 @@ class UserOrdersListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
             return True
 
         return False
+
+
+class UserOrderExportView(View):
+    """Экспорт заказов конкретного пользователя"""
+
+    def get(self, request: HttpRequest, **kwargs) -> JsonResponse:
+        """Получения json страницы с заказми пользоватля"""
+        user_id = self.kwargs["user_id"]
+
+        get_object_or_404(User, id=user_id) # Если пользователя нет 404
+        cache_key = f"orders_data_export_for_user_{user_id}"
+        orders_data = cache.get(cache_key)
+        if orders_data is None:
+            user_order = (Order.objects.
+                          filter(user=user_id).
+                          select_related("user").
+                          prefetch_related("products").
+                          order_by("pk"))
+
+            user_order_data_sereilized = OrderSerializer(user_order, many=True).data
+
+            cache.set(cache_key, orders_data, timeout=120)
+
+            return JsonResponse({"user_order": user_order_data_sereilized})
+
+
+
+class OrdersExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    """View для выгрузки товаров в формате JsonResponse"""
+    permission_required = "shopapp.view_order"
+
+    def test_func(self):
+        """Разрешение только для staff пользователей"""
+        return self.request.user.is_staff
+
+    def get(self, request: HttpRequest) -> JsonResponse:
+        """Get - запрос. Получает страницу с JSON ответом"""
+        orders: Order = Order.objects.select_related("user").prefetch_related("products").all()
+        orders_data = [
+            {
+                "pk": order.pk,
+                "delivery_adress": order.delivery_adress,
+                "promocode": order.promocode,
+                "created_at": str(order.created_at),
+                "user": order.user.id,
+                "products": [product.id for product in order.products.all()
+                             ]
+            } for order in orders
+        ]
+
+        return JsonResponse({"orders": orders_data})
 
 
 class ProductDetailView(LoginRequiredMixin, DetailView):
