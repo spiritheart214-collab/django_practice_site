@@ -448,7 +448,7 @@ class UserOrderExportView(View):
         """Получения json страницы с заказми пользоватля"""
         user_id = self.kwargs["user_id"]
 
-        get_object_or_404(User, id=user_id) # Если пользователя нет 404
+        get_object_or_404(User, id=user_id)  # Если пользователя нет 404
         cache_key = f"orders_data_export_for_user_{user_id}"
         orders_data = cache.get(cache_key)
         if orders_data is None:
@@ -463,7 +463,6 @@ class UserOrderExportView(View):
             cache.set(cache_key, orders_data, timeout=120)
 
             return JsonResponse({"user_order": user_order_data_sereilized})
-
 
 
 class OrdersExportView(LoginRequiredMixin, PermissionRequiredMixin, View):
