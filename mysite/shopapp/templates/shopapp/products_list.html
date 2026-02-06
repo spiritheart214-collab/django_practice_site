@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block title %}
+{% translate "Products " %}  - {% block subtitle %}Our Products{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'shopapp/css/products_list.css' %}">
+{% endblock %}
+
+{% block main %}
+
+
+<div class="products-container">
+    <h1>Our Products</h1>
+    <p class="products-count">Total products: {{ products|length }}</p>
+
+
+    {% if perms.shopapp.add_product %}
+        <div class="products-navigation">
+            <a href="{% url 'shopapp:create_product' %}" class="nav-button create-button">
+                <span class="button-icon">➕</span>
+                Create New Product
+            </a>
+        </div>
+    {% endif %}
+
+
+
+    <div class="products-grid">
+        {% for product in products %}
+         <a href="{% url 'shopapp:product_details' product.pk %}" class="product-card-link">
+        <div class="product-card {% if product.archived %}archived{% endif %} {% if product.discount %}discounted{% endif %}">
+            <div class="product-header">
+                <h2 class="product-name">{{ product.name }}</h2>
+                {% if product.archived %}
+                <span class="archived-badge">ARCHIVED</span>
+                {% endif %}
+            </div>
+
+            {% if product.description %}
+            <div class="product-description">
+                <p>{{ product.description|truncatewords:20 }}</p>
+            </div>
+            {% endif %}
+
+            <div class="product-pricing">
+                {% if product.discount %}
+                <div class="price-with-discount">
+                    <span class="original-price">${{ product.price }}</span>
+                    <span class="discounted-price">
+                        ${{ product.get_discounted_price }}
+                    </span>
+                    <span class="discount-badge">-{{ product.discount }}%</span>
+                </div>
+                {% else %}
+                <span class="regular-price">${{ product.price }}</span>
+                {% endif %}
+            </div>
+
+            <div class="product-meta">
+                <div class="meta-item">
+                    <span class="meta-label">Created:</span>
+                    <span class="meta-value">{{ product.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Status:</span>
+                    <span class="meta-value {% if product.archived %}status-archived{% else %}status-active{% endif %}">
+                        {% if product.archived %}Archived{% else %}Active{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Добавьте индикатор кликабельности -->
+            <div class="product-hover-indicator">
+                <span class="view-details">View Details →</span>
+            </div>
+        </div>
+    </a>
+{% empty %}
+<div class="no-products">
+    <h2>No products available</h2>
+    <p>There are no products in the catalog at the moment.</p>
+</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

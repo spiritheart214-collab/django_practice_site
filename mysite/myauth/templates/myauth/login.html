@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | TechStore Admin</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'myauth/css/login.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Левый блок с формой -->
+        <div class="login-form-section">
+            <div class="form-container">
+                <!-- Логотип -->
+                <div class="brand-header">
+                    <div class="logo">
+                        <i class="fas fa-store"></i>
+                        <span>TechStore</span>
+                    </div>
+                    <p class="brand-subtitle">Admin Dashboard</p>
+                </div>
+
+                <!-- Заголовок -->
+                <div class="form-header">
+                    <h1>Welcome Back</h1>
+                    <p class="form-subtitle">Sign in to access your dashboard</p>
+                </div>
+
+                <!-- Сообщения об ошибках -->
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <strong>Invalid credentials</strong>
+                        <p>Please check your username and password.</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning">
+                        <p>Your account doesn't have access to this page.</p>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <p>Please login to see this page.</p>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <!-- Форма входа -->
+                <form method="POST" class="login-form" id="loginForm">
+                    {% csrf_token %}
+
+                    <!-- Поле username -->
+                    <div class="form-group">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Username
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.username }}
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Поле password -->
+                    <div class="form-group">
+                        <label for="id_password" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.password }}
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <button type="button" class="password-toggle" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Enter your password
+                        </div>
+                    </div>
+
+                    <!-- Скрытое поле next -->
+                    {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                    {% endif %}
+
+                    <!-- Опции -->
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember" id="remember">
+                            <span class="checkmark"></span>
+                            <span>Remember me</span>
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <!-- Кнопка входа -->
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <span class="btn-text">Sign In</span>
+                        <i class="fas fa-arrow-right btn-icon"></i>
+                    </button>
+
+                    <!-- Дополнительные ссылки -->
+                    <div class="form-links">
+                        <p>Need an account? <a href="#" class="link">Request access</a></p>
+                    </div>
+                </form>
+
+                <!-- Информация о безопасности -->
+                <div class="security-notice">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <p>Secure login</p>
+                        <small>Your credentials are protected</small>
+                    </div>
+                </div>
+
+                <!-- Футер -->
+                <div class="form-footer">
+                    <p class="copyright">&copy; {% now "Y" %} TechStore</p>
+                    <div class="footer-links">
+                        <a href="#" class="footer-link">Privacy</a>
+                        <a href="#" class="footer-link">Terms</a>
+                        <a href="#" class="footer-link">Help</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правый блок с информацией -->
+        <div class="login-info-section">
+            <div class="info-overlay"></div>
+            <div class="info-content">
+                <div class="info-header">
+                    <h2>Powerful Store Management</h2>
+                    <p>Everything you need to run your online store</p>
+                </div>
+
+                <div class="features">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Product Catalog</h3>
+                            <p>Manage thousands of products with ease</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Order Processing</h3>
+                            <p>Track and fulfill orders efficiently</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Sales Analytics</h3>
+                            <p>Real-time insights into your business</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h3>Customer Management</h3>
+                            <p>Build lasting relationships with customers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <p class="quote">
+                        "This admin panel saved us hours of work every day. Highly recommended!"
+                    </p>
+                    <div class="author">
+                        <div class="author-avatar">MJ</div>
+                        <div class="author-info">
+                            <strong>Michael Johnson</strong>
+                            <span>Store Owner</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordField = document.getElementById('id_password');
+
+            if (togglePassword && passwordField) {
+                togglePassword.addEventListener('click', function() {
+                    const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', type);
+                    this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                });
+            }
+
+            // Form submission animation
+            const loginForm = document.getElementById('loginForm');
+            const loginBtn = document.getElementById('loginBtn');
+
+            if (loginForm && loginBtn) {
+                loginForm.addEventListener('submit', function() {
+                    const btnText = loginBtn.querySelector('.btn-text');
+                    const originalText = btnText.textContent;
+
+                    btnText.textContent = 'Signing in...';
+                    loginBtn.disabled = true;
+
+                    // Reset after 5 seconds if error
+                    setTimeout(() => {
+                        btnText.textContent = originalText;
+                        loginBtn.disabled = false;
+                    }, 5000);
+                });
+            }
+
+            // Add classes to Django form inputs
+            const usernameField = document.getElementById('id_username');
+            const passwordField = document.getElementById('id_password');
+
+            if (usernameField) {
+                usernameField.className = 'form-input';
+                usernameField.placeholder = 'Enter your username';
+            }
+
+            if (passwordField) {
+                passwordField.className = 'form-input';
+                passwordField.placeholder = 'Enter your password';
+            }
+
+            // Checkbox styling
+            const rememberCheckbox = document.getElementById('remember');
+            if (rememberCheckbox) {
+                rememberCheckbox.addEventListener('change', function() {
+                    const label = this.closest('.checkbox-label');
+                    if (this.checked) {
+                        label.classList.add('checked');
+                    } else {
+                        label.classList.remove('checked');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

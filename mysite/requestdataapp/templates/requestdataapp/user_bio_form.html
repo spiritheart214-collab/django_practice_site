@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    User Bio Form
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'requestdataapp/css/user-bio-form.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="bio-form-container">
+    <!-- Header Section -->
+    <div class="form-header">
+        <h1 class="form-title">👤 User Bio Form</h1>
+        <p class="form-subtitle">Tell us about yourself</p>
+    </div>
+
+    <!-- Bio Form -->
+    <div class="form-card">
+        <div class="card-header">
+            <h2>Personal Information</h2>
+            <p class="card-description">Fill out your details below</p>
+        </div>
+
+        <form method="post" class="bio-form" id="bioForm">
+            {% csrf_token %}
+
+            <div class="form-grid">
+                <!-- Full Name Field -->
+                <div class="form-group">
+                    <label for="name-id" class="form-label">
+                        <span class="label-icon">👤</span>
+                        Full Name
+                    </label>
+
+                    {{ form.name }}
+
+                    <div class="input-hint">Maximum 100 characters</div>
+                </div>
+
+                <!-- Age Field -->
+                <div class="form-group">
+                    <label for="age" class="form-label">
+                        <span class="label-icon">🎂</span>
+                        Age
+                    </label>
+                    {{ form.age }}
+                    <div class="input-hint">Must be between 1 and 99</div>
+                </div>
+            </div>
+
+            <!-- Bio Field -->
+            <div class="form-group">
+                <label for="bio" class="form-label">
+                    <span class="label-icon">📝</span>
+                    Biography
+                </label>
+
+                {{ form.bio }}
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-button">
+                <span class="button-icon">🚀</span>
+                Submit Bio
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    {% if request.POST %}
+    <div class="results-card">
+        <div class="results-header">
+            <h2>✅ Form Data Received</h2>
+            <p class="results-subtitle">Here's what you submitted:</p>
+        </div>
+
+        <div class="results-grid">
+            <div class="result-item">
+                <div class="result-label">
+                    <span class="result-icon">👤</span>
+                    Full Name
+                </div>
+                <div class="result-value">
+                    {{ request.POST.name|default:"Not provided" }}
+                </div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">
+                    <span class="result-icon">🎂</span>
+                    Age
+                </div>
+                <div class="result-value">
+                    {{ request.POST.age|default:"Not provided" }}
+                </div>
+            </div>
+
+            <div class="result-item full-width">
+                <div class="result-label">
+                    <span class="result-icon">📝</span>
+                    Biography
+                </div>
+                <div class="result-value bio-content">
+                    {% if request.POST.bio %}
+                        {{ request.POST.bio|linebreaks }}
+                    {% else %}
+                        <em>No biography provided</em>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-meta">
+            <p class="meta-info">
+                <strong>Submitted via:</strong> {{ request.method }} request
+                {% if request.POST %}
+                • <strong>Parameters:</strong> {{ request.POST|length }}
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Features Info -->
+    <div class="features-section">
+        <h3>✨ Form Features</h3>
+        <div class="features-grid">
+            <div class="feature-item">
+                <span class="feature-icon">🛡️</span>
+                <div class="feature-text">
+                    <strong>CSRF Protected</strong>
+                    <p>Secure form submission</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📱</span>
+                <div class="feature-text">
+                    <strong>Responsive</strong>
+                    <p>Works on all devices</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">⚡</span>
+                <div class="feature-text">
+                    <strong>Instant Feedback</strong>
+                    <p>See results immediately</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('bioForm');
+    const inputs = form.querySelectorAll('.form-input, .form-textarea');
+
+    // Add focus effects
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+
+        // Check if input has value on page load
+        if (input.value) {
+            input.parentElement.classList.add('focused');
+        }
+    });
+
+    // Form submission feedback
+    form.addEventListener('submit', function() {
+        const button = this.querySelector('.submit-button');
+        const originalText = button.innerHTML;
+
+        button.innerHTML = `
+            <span class="button-icon">⏳</span>
+            Submitting...
+        `;
+        button.disabled = true;
+    });
+});
+</script>
+{% endblock %}

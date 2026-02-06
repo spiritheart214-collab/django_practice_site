@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ product.name }} - {% block subtitle %}Product Details{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'shopapp/css/product-details.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="product-details">
+        <!-- Хлебные крошки -->
+        <nav class="breadcrumbs">
+            <a href="{% url 'shopapp:products_list' %}">Products</a>
+            <span class="separator">/</span>
+            <span class="current">{{ product.name }}</span>
+        </nav>
+
+        <!-- Основная информация о продукте -->
+        <div class="product-main">
+            <div class="product-image">
+                <div class="image-placeholder">
+                    <span class="image-icon">📷</span>
+                    {% if product.preview %}
+                        <img style="object-fit: contain; max-width: 100%; height: auto;" src="{{ product.preview.url }}" alt="{{ product.preview.name }}" width="425" height="380">
+                    {% else %}
+                        <p>No product Image</p>
+                    {% endif %}
+                </div>
+
+                {% if product.discount %}
+                <div class="discount-badge">-{{ product.discount }}%</div>
+                {% endif %}
+            </div>
+
+            <div class="product-info">
+                <div class="product-header">
+                    <h1 class="product-title">{{ product.name }}</h1>
+                    <div class="product-meta">
+                        <span class="product-id">ID: #{{ product.pk }}</span>
+                        <span class="product-status {% if product.archived %}archived{% else %}active{% endif %}">
+                            {% if product.archived %}Archived{% else %}Active{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="product-pricing">
+                    {% if product.discount %}
+                    <div class="price-original">${{ product.price }}</div>
+                    <div class="price-final">
+                        ${{ product.get_discounted_price|floatformat:2 }}
+                    </div>
+                    <div class="discount-savings">
+                        You save ${{ product.get_discount_amount|floatformat:2 }}
+                    </div>
+                    {% else %}
+                    <div class="price-final">${{ product.price }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="product-actions">
+                    <button class="btn-primary">
+                        <span class="btn-icon">🛒</span>
+                        Add to Cart
+                    </button>
+                    <button class="btn-secondary">
+                        <span class="btn-icon">❤️</span>
+                        Add to Wishlist
+                    </button>
+                </div>
+
+                <div class="product-specs">
+                    <div class="spec-item">
+                        <span class="spec-label">Created:</span>
+                        <span class="spec-value">{{ product.created_at|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">SKU:</span>
+                        <span class="spec-value">PROD-{{ product.pk|stringformat:"04d" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дополнительные изображения -->
+        <div class="additional-images-section">
+            <h3 class="additional-images-title">Gallery</h3>
+
+            {% if product.images.all %}
+                <div class="images-gallery">
+                    {% for img in product.images.all %}
+                    <div class="gallery-item">
+                        <div class="gallery-image-container">
+                            <img src="{{ img.image.url }}"
+                                 alt="{{ img.description|default:product.name }}"
+                                 class="gallery-image"
+                                 loading="lazy">
+                        </div>
+                        {% if img.description %}
+                        <p class="image-description">{{ img.description }}</p>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="no-images-message">
+                    <div class="no-images-icon">📷</div>
+                    <p>No additional images uploaded</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Описание продукта -->
+        <div class="product-description">
+            <h2>Product Description</h2>
+            <div class="description-content">
+                {% if product.description %}
+                    <p>{{ product.description }}</p>
+                {% else %}
+                    <p class="no-description">No description available for this product.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Дополнительная информация -->
+        <div class="product-additional">
+            <div class="additional-grid">
+                <div class="additional-card">
+                    <div class="card-icon">🚚</div>
+                    <h3>Free Shipping</h3>
+                    <p>Free delivery on orders over $50</p>
+                </div>
+                <div class="additional-card">
+                    <div class="card-icon">↩️</div>
+                    <h3>30-Day Return</h3>
+                    <p>Money-back guarantee</p>
+                </div>
+                <div class="additional-card">
+                    <div class="card-icon">🔒</div>
+                    <h3>Secure Payment</h3>
+                    <p>Your data is protected</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Навигация между продуктами -->
+        <div class="product-navigation">
+            <a href="{% url 'shopapp:products_list' %}" class="back-link">
+                <span class="back-icon">←</span>
+                Back to Products
+            </a>
+            <a href="{% url 'shopapp:product_update' pk=product.pk %}" class="back-link">
+                <span class="back-icon">←</span>
+                Update Products
+            </a>
+             <a href="{% url 'shopapp:product_delete' pk=product.pk %}" class="back-link">
+                <span class="back-icon">←</span>
+                Delete Products
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+    // Lightbox функционал
+    document.addEventListener('DOMContentLoaded', function() {
+        const galleryImages = document.querySelectorAll('.gallery-image');
+        const lightbox = document.createElement('div');
+        lightbox.className = 'lightbox';
+        lightbox.innerHTML = `
+            <button class="lightbox-close">×</button>
+            <div class="lightbox-content">
+                <img class="lightbox-image" src="" alt="">
+            </div>
+            <div class="lightbox-nav">
+                <button class="lightbox-prev">←</button>
+                <button class="lightbox-next">→</button>
+            </div>
+        `;
+        document.body.appendChild(lightbox);
+
+        let currentImageIndex = 0;
+        const imagesArray = Array.from(galleryImages);
+
+        galleryImages.forEach((img, index) => {
+            img.addEventListener('click', function() {
+                currentImageIndex = index;
+                openLightbox(this.src, this.alt);
+            });
+        });
+
+        function openLightbox(src, alt) {
+            lightbox.classList.add('active');
+            const lightboxImage = lightbox.querySelector('.lightbox-image');
+            lightboxImage.src = src;
+            lightboxImage.alt = alt;
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+        }
+
+        function navigateLightbox(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex < 0) {
+                currentImageIndex = imagesArray.length - 1;
+            } else if (currentImageIndex >= imagesArray.length) {
+                currentImageIndex = 0;
+            }
+
+            const nextImage = imagesArray[currentImageIndex];
+            openLightbox(nextImage.src, nextImage.alt);
+        }
+
+        // Обработчики событий
+        lightbox.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+        lightbox.querySelector('.lightbox-prev').addEventListener('click', () => navigateLightbox(-1));
+        lightbox.querySelector('.lightbox-next').addEventListener('click', () => navigateLightbox(1));
+
+        // Закрытие по клику на фон
+        lightbox.addEventListener('click', function(e) {
+            if (e.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        // Навигация клавишами
+        document.addEventListener('keydown', function(e) {
+            if (!lightbox.classList.contains('active')) return;
+
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') navigateLightbox(-1);
+            if (e.key === 'ArrowRight') navigateLightbox(1);
+        });
+    });
+    </script>
+{% endblock %}

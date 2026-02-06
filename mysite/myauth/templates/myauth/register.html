@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | TechStore</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'myauth/css/registration.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Inline стили для иконок Font Awesome */
+        .fas, .fab {
+            font-family: 'Font Awesome 6 Free' !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="registration-wrapper">
+        <!-- Левая часть - форма -->
+        <div class="registration-form-section">
+            <div class="form-container">
+                <!-- Логотип -->
+                <div class="brand-header">
+                    <a href="/" class="logo-link">
+                        <div class="logo">
+                            <i class="fas fa-store"></i>
+                            <span>TechStore</span>
+                        </div>
+                    </a>
+                    <p class="brand-subtitle">Create Your Account</p>
+                </div>
+
+                <!-- Прогресс-бар -->
+                <div class="progress-bar">
+                    <div class="progress-step active">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Account</span>
+                    </div>
+                    <div class="progress-step">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Profile</span>
+                    </div>
+                    <div class="progress-step">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Complete</span>
+                    </div>
+                </div>
+
+                <!-- Заголовок -->
+                <div class="form-header">
+                    <h1>Join TechStore</h1>
+                    <p class="form-subtitle">Create your account in 30 seconds</p>
+                </div>
+
+                <!-- Сообщения об ошибках -->
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <strong>Please correct the following errors:</strong>
+                        <ul class="error-list">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Форма регистрации -->
+                <form method="POST" class="registration-form" id="registrationForm">
+                    {% csrf_token %}
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label for="id_username" class="form-label">
+                            <i class="fas fa-user"></i>
+                            Username
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.username }}
+                            <div class="input-icon">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.
+                        </div>
+                    </div>
+
+                    <!-- Password 1 -->
+                    <div class="form-group">
+                        <label for="id_password1" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Password
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.password1 }}
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <button type="button" class="password-toggle" data-target="id_password1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="passwordStrength"></div>
+                            </div>
+                            <div class="strength-label" id="strengthLabel">Password strength</div>
+                        </div>
+                    </div>
+
+                    <!-- Password 2 -->
+                    <div class="form-group">
+                        <label for="id_password2" class="form-label">
+                            <i class="fas fa-lock"></i>
+                            Password Confirmation
+                            <span class="required">*</span>
+                        </label>
+                        <div class="input-wrapper">
+                            {{ form.password2 }}
+                            <div class="input-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <button type="button" class="password-toggle" data-target="id_password2">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Enter the same password as before, for verification.
+                        </div>
+                    </div>
+
+                    <!-- Кнопка регистрации -->
+                    <button type="submit" class="btn-register" id="registerBtn">
+                        <span class="btn-text">Create Account</span>
+                        <i class="fas fa-arrow-right btn-icon"></i>
+                    </button>
+
+                    <!-- Разделитель -->
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <!-- Социальная регистрация -->
+                    <div class="social-registration">
+                        <p class="social-text">Sign up with</p>
+                        <div class="social-buttons">
+                            <button type="button" class="social-btn google-btn">
+                                <i class="fab fa-google"></i>
+                                <span>Google</span>
+                            </button>
+                            <button type="button" class="social-btn github-btn">
+                                <i class="fab fa-github"></i>
+                                <span>GitHub</span>
+                            </button>
+                            <button type="button" class="social-btn facebook-btn">
+                                <i class="fab fa-facebook"></i>
+                                <span>Facebook</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Ссылка на вход -->
+                    <div class="login-link">
+                        <p>Already have an account? <a href="{% url 'myauth:login' %}" class="link">Sign In</a></p>
+                    </div>
+                </form>
+
+                <!-- Информация о безопасности -->
+                <div class="security-notice">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>
+                        <p>Your data is protected</p>
+                        <small>We use bank-level encryption to secure your information</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая часть - информация -->
+        <div class="registration-info-section">
+            <div class="info-overlay"></div>
+            <div class="info-content">
+                <!-- Заголовок -->
+                <div class="info-header">
+                    <h2>Join Thousands of Happy Customers</h2>
+                    <p>Discover why TechStore is the trusted choice for tech enthusiasts</p>
+                </div>
+
+                <!-- Преимущества -->
+                <div class="benefits">
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Free Shipping</h3>
+                            <p>Free delivery on all orders over $50</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-undo-alt"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>30-Day Returns</h3>
+                            <p>Hassle-free returns within 30 days</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>24/7 Support</h3>
+                            <p>Round-the-clock customer support</p>
+                        </div>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h3>Secure Payments</h3>
+                            <p>Your payment information is protected</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Статистика -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">10K+</div>
+                        <div class="stat-label">Products</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">50K+</div>
+                        <div class="stat-label">Customers</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Satisfaction</div>
+                    </div>
+                </div>
+
+                <!-- Отзыв -->
+                <div class="testimonial">
+                    <div class="quote-icon">
+                        <i class="fas fa-quote-left"></i>
+                    </div>
+                    <p class="quote">
+                        "TechStore made shopping for tech gear effortless. The selection is incredible and delivery was lightning fast!"
+                    </p>
+                    <div class="author">
+                        <div class="author-avatar">AJ</div>
+                        <div class="author-info">
+                            <strong>Alex Johnson</strong>
+                            <span>Verified Customer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Добавляем классы и атрибуты к полям формы Django
+            const usernameField = document.getElementById('id_username');
+            const password1Field = document.getElementById('id_password1');
+            const password2Field = document.getElementById('id_password2');
+
+            if (usernameField) {
+                usernameField.className = 'form-input';
+                usernameField.placeholder = 'Enter your username';
+                usernameField.setAttribute('autocomplete', 'username');
+            }
+
+            if (password1Field) {
+                password1Field.className = 'form-input';
+                password1Field.placeholder = 'Create a password';
+                password1Field.setAttribute('autocomplete', 'new-password');
+            }
+
+            if (password2Field) {
+                password2Field.className = 'form-input';
+                password2Field.placeholder = 'Confirm your password';
+                password2Field.setAttribute('autocomplete', 'new-password');
+            }
+
+            // Toggle password visibility
+            const passwordToggles = document.querySelectorAll('.password-toggle');
+            passwordToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const passwordField = document.getElementById(targetId);
+                    if (passwordField) {
+                        const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordField.setAttribute('type', type);
+                        this.querySelector('i').className = type === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash';
+                    }
+                });
+            });
+
+            // Password strength indicator
+            const password1Input = document.getElementById('id_password1');
+            const strengthBar = document.getElementById('passwordStrength');
+            const strengthLabel = document.getElementById('strengthLabel');
+
+            if (password1Input && strengthBar && strengthLabel) {
+                password1Input.addEventListener('input', function() {
+                    const password = this.value;
+                    const strength = calculatePasswordStrength(password);
+
+                    // Update strength bar
+                    strengthBar.style.width = strength.percentage + '%';
+                    strengthBar.className = 'strength-fill ' + strength.class;
+
+                    // Update label
+                    strengthLabel.textContent = strength.label;
+                    strengthLabel.style.color = strength.color;
+                });
+
+                function calculatePasswordStrength(password) {
+                    let score = 0;
+
+                    // Length check
+                    if (password.length >= 8) score += 25;
+                    if (password.length >= 12) score += 25;
+
+                    // Complexity checks
+                    if (/[A-Z]/.test(password)) score += 15;
+                    if (/[a-z]/.test(password)) score += 15;
+                    if (/[0-9]/.test(password)) score += 10;
+                    if (/[^A-Za-z0-9]/.test(password)) score += 10;
+
+                    // Determine strength level
+                    if (score >= 80) {
+                        return {
+                            percentage: 100,
+                            class: 'strength-strong',
+                            label: 'Strong password',
+                            color: '#10b981'
+                        };
+                    } else if (score >= 60) {
+                        return {
+                            percentage: 75,
+                            class: 'strength-good',
+                            label: 'Good password',
+                            color: '#3b82f6'
+                        };
+                    } else if (score >= 40) {
+                        return {
+                            percentage: 50,
+                            class: 'strength-fair',
+                            label: 'Fair password',
+                            color: '#f59e0b'
+                        };
+                    } else if (password.length > 0) {
+                        return {
+                            percentage: 25,
+                            class: 'strength-weak',
+                            label: 'Weak password',
+                            color: '#ef4444'
+                        };
+                    } else {
+                        return {
+                            percentage: 0,
+                            class: '',
+                            label: 'Password strength',
+                            color: '#6b7280'
+                        };
+                    }
+                }
+            }
+
+            // Terms checkbox styling
+            const termsCheckbox = document.getElementById('terms');
+            if (termsCheckbox) {
+                termsCheckbox.addEventListener('change', function() {
+                    const label = this.closest('.checkbox-label');
+                    if (this.checked) {
+                        label.classList.add('checked');
+                    } else {
+                        label.classList.remove('checked');
+                    }
+                });
+            }
+
+            // Form submission animation
+            const registrationForm = document.getElementById('registrationForm');
+            const registerBtn = document.getElementById('registerBtn');
+
+            if (registrationForm && registerBtn) {
+                registrationForm.addEventListener('submit', function(e) {
+                    // Check terms agreement
+                    if (!termsCheckbox.checked) {
+                        e.preventDefault();
+                        alert('Please agree to the Terms of Service and Privacy Policy');
+                        return;
+                    }
+
+                    const btnText = registerBtn.querySelector('.btn-text');
+                    const originalText = btnText.textContent;
+
+                    btnText.textContent = 'Creating account...';
+                    registerBtn.disabled = true;
+
+                    // Reset after 5 seconds if error
+                    setTimeout(() => {
+                        btnText.textContent = originalText;
+                        registerBtn.disabled = false;
+                    }, 5000);
+                });
+            }
+
+            // Social buttons animation
+            const socialButtons = document.querySelectorAll('.social-btn');
+            socialButtons.forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

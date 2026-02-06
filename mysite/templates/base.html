@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% block title %}
+            TechStore - {% block subtitle %}BASE TITLE{% endblock %}
+        {% endblock %}
+    </title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">{{ shop_name|default:"TechStore" }}</div>
+                <nav class="nav">
+                    <a href="#">Home</a>
+                    <a href="#">Products</a>
+                    <a href="#">About</a>
+                    <a href="#">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block main %}
+                <!-- Content will be inserted here -->
+            {% endblock %}
+        </div>
+    </main>
+
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {{ current_year|default:"2024" }} {{ shop_name|default:"TechStore" }}. All rights reserved.</p>
+            {% now 'Y-m-d H:i' as current_datetime %}
+            <p>Page generated on: {{ current_datetime }}</p>
+            <p>HTTP USER - AGENT {{ request.user_agent }}</p>
+        </div>
+    </footer>
+
+{% block extra_js %}
+{% endblock %}
+</body>
+</html>

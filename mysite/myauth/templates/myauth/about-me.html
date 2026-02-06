@@ -1,0 +1,426 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    About Me - {% block subtitle %}Profile Information{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'mysite/css/about-me.css' %}">
+<style>
+    /* Дополнительные стили для аватарки */
+    .avatar-section {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        border: 1px solid #e5e7eb;
+    }
+
+    .avatar-display {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .avatar-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #3b82f6;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .no-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 600;
+        border: 4px solid #3b82f6;
+    }
+
+    .avatar-info {
+        flex: 1;
+    }
+
+    .avatar-info h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .avatar-info p {
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+
+    .avatar-form {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .file-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px dashed #cbd5e1;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+
+    .file-input:hover {
+        border-color: #3b82f6;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s ease;
+    }
+
+    .btn-primary:hover {
+        background: #2563eb;
+    }
+
+    .btn-secondary {
+        background: #f1f5f9;
+        color: #374151;
+        border: 1px solid #e2e8f0;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .avatar-preview {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .avatar-preview img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #10b981;
+        margin-top: 0.5rem;
+    }
+
+    .file-info {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
+
+    @media (max-width: 768px) {
+        .avatar-display {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .avatar-image, .no-avatar {
+            width: 100px;
+            height: 100px;
+            font-size: 2rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block main %}
+<div class="profile-container">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="{% url 'shopapp:products_list' %}">Home</a>
+        <span class="separator">/</span>
+        <span class="current">My Profile</span>
+    </nav>
+
+    <!-- Заголовок -->
+    <div class="profile-header">
+        <h1>My Profile</h1>
+        <p class="profile-subtitle">Welcome back!</p>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="profile-content">
+        <!-- Левая колонка - информация о пользователе -->
+        <div class="profile-card">
+            <div class="card-header">
+                <!-- Аватарка пользователя -->
+                <div class="user-avatar">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}"
+                             alt="User's avatar"
+                             class="avatar-image">
+                    {% endif %}
+                </div>
+                <div class="user-name">
+                    <h2>
+                        User
+                    </h2>
+                    <span class="user-role">Registered User</span>
+                </div>
+            </div>
+
+            <!-- Секция аватарки -->
+            <div class="avatar-section">
+                <div class="avatar-display">
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}"
+                             alt="User's avatar"
+                             class="avatar-image">
+                        <div class="avatar-info">
+                            <h3>Your Avatar</h3>
+                            <p>Current profile picture. You can change it using the form below.</p>
+                            <div class="file-info">
+                                <i class="fas fa-image"></i>
+                                avatar.jpg
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="no-avatar">
+                            A
+                        </div>
+                        <div class="avatar-info">
+                            <h3>No Avatar</h3>
+                            <p>You haven't uploaded a profile picture yet. Add one using the form below.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Форма изменения аватарки -->
+                <form method="post" enctype="multipart/form-data" class="avatar-form" id="avatarForm">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="avatar">
+                            <i class="fas fa-camera"></i> Upload New Avatar
+                        </label>
+                          {{ form.as_p }}
+                        <div class="avatar-preview" id="avatarPreview" style="display: none;">
+                            <p>Preview:</p>
+                            <img id="previewImage" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Save Avatar
+                        </button>
+                        {% if user.profile.avatar %}
+                        <button type="button" class="btn-secondary" onclick="removeAvatar()">
+                            <i class="fas fa-trash"></i> Remove Avatar
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <div class="user-info">
+                <div class="info-section">
+                    <h3><i class="fas fa-id-card"></i> Basic Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Username:</span>
+                            <span class="info-value">username</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">First Name:</span>
+                            <span class="info-value">First Name</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Last Name:</span>
+                            <span class="info-value">Last Name</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Email:</span>
+                            <span class="info-value">email@example.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-calendar-check"></i> Account Details</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Member Since:</span>
+                            <span class="info-value">January 15, 2024</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Login:</span>
+                            <span class="info-value">March 10, 2024 14:30</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="info-value status-active">
+                                <i class="fas fa-circle"></i> Active
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">User ID:</span>
+                            <span class="info-value">#123</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Анимация статистики
+    const statNumbers = document.querySelectorAll('.stat-number');
+    statNumbers.forEach(stat => {
+        const target = parseInt(stat.textContent);
+        if (target > 0) {
+            animateCounter(stat, target);
+        }
+    });
+
+    function animateCounter(element, target) {
+        let current = 0;
+        const increment = target / 100;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target;
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current);
+            }
+        }, 20);
+    }
+
+    // Подсветка активной кнопки
+    const actionButtons = document.querySelectorAll('.action-btn');
+    actionButtons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+// Предпросмотр аватарки перед загрузкой
+function previewAvatar(event) {
+    const input = event.target;
+    const preview = document.getElementById('avatarPreview');
+    const previewImage = document.getElementById('previewImage');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.style.display = 'block';
+        }
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.style.display = 'none';
+    }
+}
+
+// Удаление аватарки
+function removeAvatar() {
+    if (confirm('Are you sure you want to remove your avatar?')) {
+        // Создаем скрытую форму для удаления
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = window.location.href;
+
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        const removeInput = document.createElement('input');
+        removeInput.type = 'hidden';
+        removeInput.name = 'remove_avatar';
+        removeInput.value = 'true';
+
+        form.appendChild(csrfInput);
+        form.appendChild(removeInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Валидация размера файла
+document.getElementById('avatarForm').addEventListener('submit', function(e) {
+    const fileInput = document.getElementById('avatar');
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (file.size > maxSize) {
+            e.preventDefault();
+            alert('File is too large. Maximum size is 5MB.');
+            return false;
+        }
+
+        // Проверка типа файла
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            e.preventDefault();
+            alert('Please upload an image file (JPEG, PNG, GIF, WebP).');
+            return false;
+        }
+    }
+    return true;
+});
+</script>
+{% endblock %}

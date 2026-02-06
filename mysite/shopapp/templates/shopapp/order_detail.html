@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Order #{{ order.pk }} - {% block subtitle %}Order Details{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shopapp/css/order_detail.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="order-detail-container">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="{% url 'shopapp:orders_list' %}">Orders</a>
+        <span class="separator">/</span>
+        <span class="current">Order #{{ order.pk }}</span>
+    </nav>
+
+    <!-- Заголовок заказа -->
+    <div class="order-header">
+        <div class="order-title-section">
+            <h1 class="order-title">Order #{{ order.pk }}</h1>
+            <div class="order-status-badge status-active">Active</div>
+        </div>
+        <div class="order-meta">
+            <div class="meta-item">
+                <span class="meta-label">Created:</span>
+                <span class="meta-value">{{ order.created_at|date:"F d, Y H:i" }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Time ago:</span>
+                <span class="meta-value">{{ order.created_at|timesince }} ago</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-layout">
+        <!-- Основная информация -->
+        <div class="order-main">
+            <!-- Информация о пользователе -->
+            <section class="order-section user-section">
+                <h2 class="section-title">
+                    <span class="section-icon">👤</span>
+                    Customer Information
+                </h2>
+                <div class="user-card">
+                    <div class="user-avatar">
+                        {{ order.user.username|first|upper }}
+                    </div>
+                    <div class="user-details">
+                        <h3 class="user-name">{{ order.user.username }}</h3>
+                        <div class="user-info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Full Name:</span>
+                                <span class="info-value">
+                                    {% if order.user.first_name or order.user.last_name %}
+                                        {{ order.user.first_name }} {{ order.user.last_name }}
+                                    {% else %}
+                                        <em>Not specified</em>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">
+                                    {% if order.user.email %}
+                                        {{ order.user.email }}
+                                    {% else %}
+                                        <em>No email</em>
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">User ID:</span>
+                                <span class="info-value">#{{ order.user.id }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Товары в заказе -->
+            <section class="order-section products-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🛍️</span>
+                    Order Items ({{ order.products.count }})
+                </h2>
+                
+                {% if order.products.all %}
+                <div class="products-list">
+                    {% for product in order.products.all %}
+                    <div class="product-item">
+                        <div class="product-info">
+                            <h4 class="product-name">{{ product.name }}</h4>
+                            <div class="product-meta">
+                                <span class="product-price">${{ product.price }}</span>
+                                {% if product.discount %}
+                                <span class="product-discount">-{{ product.discount }}%</span>
+                                {% endif %}
+                                <span class="product-status {% if product.archived %}archived{% else %}active{% endif %}">
+                                    {% if product.archived %}Archived{% else %}Active{% endif %}
+                                </span>
+                            </div>
+                            {% if product.description %}
+                            <p class="product-description">{{ product.description|truncatewords:15 }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="product-actions">
+                            <a href="{% url 'shopapp:product_details' product.pk %}" class="view-product-btn">
+                                View Product
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h3>No products in this order</h3>
+                    <p>This order doesn't contain any products yet.</p>
+                </div>
+                {% endif %}
+            </section>
+        </div>
+
+        <!-- Боковая панель с деталями заказа -->
+        <div class="order-sidebar">
+            <!-- Детали доставки -->
+            <section class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <span class="sidebar-icon">📍</span>
+                    Delivery Details
+                </h3>
+                <div class="delivery-info">
+                    {% if order.delivery_adress %}
+                    <div class="address-card">
+                        <div class="address-label">Delivery Address:</div>
+                        <div class="address-text">{{ order.delivery_adress|linebreaks }}</div>
+                    </div>
+                    {% else %}
+                    <div class="no-address">
+                        <span class="no-address-icon">🚫</span>
+                        <span>No delivery address specified</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Промокод -->
+            <section class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <span class="sidebar-icon">🎫</span>
+                    Promocode
+                </h3>
+                <div class="promocode-info">
+                    {% if order.promocode %}
+                    <div class="promocode-active">
+                        <span class="promocode-badge">{{ order.promocode }}</span>
+                        <span class="promocode-label">Applied</span>
+                    </div>
+                    {% else %}
+                    <div class="promocode-inactive">
+                        <span class="no-promocode-icon">❌</span>
+                        <span>No promocode used</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <!-- Сводка заказа -->
+            <section class="sidebar-section order-summary">
+                <h3 class="sidebar-title">
+                    <span class="sidebar-icon">📊</span>
+                    Order Summary
+                </h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="summary-label">Items:</span>
+                        <span class="summary-value">{{ order.products.count }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Total Value:</span>
+                        <span class="summary-value">${{ order.get_total_price|floatformat:2 }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Order Age:</span>
+                        <span class="summary-value">{{ order.created_at|timesince }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Действия -->
+            <section class="sidebar-section actions-section">
+                <h3 class="sidebar-title">Actions</h3>
+                <div class="action-buttons">
+                    <a href="{% url 'shopapp:orders_list' %}" class="btn-secondary">
+                        ← Back to Orders
+                    </a>
+
+                    <a href="{% url 'shopapp:order_update' pk=order.pk %}" class="btn-secondary">
+                        ↻ Update Orders
+                    </a>
+
+                    <a href="{% url 'shopapp:order_delete' pk=order.pk %}" class="btn-secondary">
+                        ❌ Delete Orders
+                    </a>
+                    <button class="btn-primary">
+                        📧 Contact Customer
+                    </button>
+                    <button class="btn-outline">
+                        🖨️ Print Order
+                    </button>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Анимация кнопок
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary, .btn-outline');
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            this.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+
+    // Подсветка товаров при наведении
+    const productItems = document.querySelectorAll('.product-item');
+    productItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateX(8px)';
+        });
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+        });
+    });
+});
+</script>
+{% endblock %}

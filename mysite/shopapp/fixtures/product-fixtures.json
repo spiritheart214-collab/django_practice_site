@@ -1,0 +1,119 @@
+[
+  {
+    "model": "shopapp.product",
+    "pk": 1,
+    "fields": {
+      "name": "Laptop",
+      "description": "",
+      "price": "0.00",
+      "discount": 0,
+      "created_at": "2025-11-07T15:37:59.200Z",
+      "archived": true,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 2,
+    "fields": {
+      "name": "Desktop (NEW)",
+      "description": "Vero iusto distinctio sit voluptas cum doloremque, consectetur mollitia dolores aperiam cumque tenetur quisquam aliquid quibusdam dicta. Commodi quaerat dignissimos ex placeat nemo sit?\r\n\r\nError quo odit a cupiditate iste porro quia quaerat possimus expedita. Eveniet sed tenetur atque quos laudantium vitae suscipit dolorem, neque vel assumenda consequatur iusto fugiat et, obcaecati aliquam veritatis corrupti, labore dolorem sed totam, accusamus sint maiores perspiciatis suscipit similique quasi. Incidunt nobis odio, velit nemo placeat laborum, aliquam nam ipsam delectus aperiam sequi a, voluptas perferendis adipisci debitis, voluptatum libero quas architecto natus dignissimos quisquam. Cum impedit et at eveniet, laborum quia iure eum pariatur quasi impedit tenetur facere quibusdam?",
+      "price": "0.00",
+      "discount": 0,
+      "created_at": "2025-11-07T15:37:59.200Z",
+      "archived": true,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 3,
+    "fields": {
+      "name": "Smartphone",
+      "description": "",
+      "price": "0.00",
+      "discount": 0,
+      "created_at": "2025-11-07T15:37:59.200Z",
+      "archived": false,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 4,
+    "fields": {
+      "name": "Tablet",
+      "description": "",
+      "price": "0.00",
+      "discount": 0,
+      "created_at": "2025-11-07T15:37:59.200Z",
+      "archived": false,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 5,
+    "fields": {
+      "name": "Headphones NEW-2",
+      "description": "",
+      "price": "0.00",
+      "discount": 0,
+      "created_at": "2025-11-07T15:37:59.200Z",
+      "archived": false,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 8,
+    "fields": {
+      "name": "Ipad",
+      "description": "Gret ipad",
+      "price": "9999.00",
+      "discount": 0,
+      "created_at": "2025-11-17T15:39:56.457Z",
+      "archived": false,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 9,
+    "fields": {
+      "name": "Iphne 16e",
+      "description": "Greate iphobe",
+      "price": "9999.99",
+      "discount": 0,
+      "created_at": "2025-11-17T15:42:45.545Z",
+      "archived": false,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 11,
+    "fields": {
+      "name": "TEST-archive",
+      "description": "",
+      "price": "0.00",
+      "discount": 0,
+      "created_at": "2025-11-24T10:41:13.298Z",
+      "archived": true,
+      "created_by": null
+    }
+  },
+  {
+    "model": "shopapp.product",
+    "pk": 12,
+    "fields": {
+      "name": "TEST new field",
+      "description": "New filed created by",
+      "price": "123.00",
+      "discount": 1,
+      "created_at": "2025-12-08T14:23:40.953Z",
+      "archived": false,
+      "created_by": null
+    }
+  }
+]

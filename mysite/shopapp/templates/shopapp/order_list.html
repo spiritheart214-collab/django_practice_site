@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Orders - {% block subtitle %}Customer Orders{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'shopapp/css/orders_list.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="orders-container">
+    <h1>Customer Orders</h1>
+    <p class="orders-count">Total orders: {{ orders|length }}</p>
+
+    <div class="simple-navigation">
+        <a href="{% url 'shopapp:create_order' %}" class="create-btn">
+            ➕ Create New Order
+        </a>
+    </div>
+
+    <div class="orders-list">
+        {% for order in orders %}
+        <a href="{% url 'shopapp:order_details' order.pk %}" class="order-card-link">
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <h2 class="order-id">Order #{{ order.id }}</h2>
+                        <span class="order-date">{{ order.created_at|date:"F d, Y H:i" }}</span>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar">
+                            {{ order.user.username|first|upper }}
+                        </div>
+                        <div class="user-details">
+                            <strong class="username">{{ order.user.username }}</strong>
+                            <span class="user-fullname">
+                                {% if order.user.first_name or order.user.last_name %}
+                                    {{ order.user.first_name }} {{ order.user.last_name }}
+                                {% else %}
+                                    No name provided
+                                {% endif %}
+                            </span>
+                            <span class="user-email">{{ order.user.email }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-products">
+                    <h3>Products in this order ({{ order.products.count }}):</h3>
+                    {% if order.products.all %}
+                    <div class="products-list">
+                        {% for product in order.products.all %}
+                        <div class="product-item">
+                            <span class="product-name">{{ product.name }}</span>
+                            <span class="product-price">${{ product.price }}</span>
+                            {% if product.discount %}
+                            <span class="product-discount">-{{ product.discount }}%</span>
+                            {% endif %}
+                            <span class="product-status {% if product.archived %}archived{% else %}active{% endif %}">
+                                {% if product.archived %}Archived{% else %}Active{% endif %}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="no-products">No products in this order</p>
+                    {% endif %}
+                </div>
+
+                <div class="order-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Delivery Address:</span>
+                        <span class="detail-value">
+                            {% if order.delivery_adress %}
+                                {{ order.delivery_adress }}
+                            {% else %}
+                                <em>Not specified</em>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Promocode:</span>
+                        <span class="detail-value">
+                            {% if order.promocode %}
+                                <span class="promocode-badge">{{ order.promocode }}</span>
+                            {% else %}
+                                <em>No promocode</em>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">User ID:</span>
+                        <span class="detail-value">{{ order.user.id }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Order Created:</span>
+                        <span class="detail-value">{{ order.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <span class="order-status">Active</span>
+                    <div class="view-indicator">View Details →</div>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="no-orders">
+            <h2>No orders found</h2>
+            <p>There are no orders in the system yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

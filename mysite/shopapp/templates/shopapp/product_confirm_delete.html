@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Delete {{ product.name }} - {% block subtitle %}Confirm Deletion{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shopapp/css/delete_confirm.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="delete-confirm-container">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="{% url 'shopapp:products_list' %}">Products</a>
+        <span class="separator">/</span>
+        <a href="{% url 'shopapp:product_details' product.pk %}">{{ product.name }}</a>
+        <span class="separator">/</span>
+        <span class="current">Delete</span>
+    </nav>
+
+    <!-- Основной контент -->
+    <div class="delete-card">
+        <div class="warning-header">
+            <div class="warning-icon">🗑️</div>
+            <h1 class="warning-title">Delete Product</h1>
+        </div>
+
+        <!-- Информация о продукте -->
+        <div class="product-preview">
+            <h2 class="product-name">{{ product.name }}</h2>
+            <div class="product-details">
+                <div class="detail-item">
+                    <span class="label">Price:</span>
+                    <span class="value">${{ product.price }}</span>
+                </div>
+                {% if product.discount %}
+                <div class="detail-item">
+                    <span class="label">Discount:</span>
+                    <span class="value">{{ product.discount }}%</span>
+                </div>
+                {% endif %}
+                <div class="detail-item">
+                    <span class="label">Created:</span>
+                    <span class="value">{{ product.created_at|date:"M d, Y" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Status:</span>
+                    <span class="value {% if product.archived %}status-archived{% else %}status-active{% endif %}">
+                        {% if product.archived %}Archived{% else %}Active{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            {% if product.description %}
+            <div class="product-description">
+                <p>{{ product.description|truncatewords:30 }}</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Предупреждение -->
+        <div class="warning-message">
+            <div class="alert alert-danger">
+                <strong>⚠️ Warning: This action cannot be undone!</strong>
+                <p>You are about to permanently delete this product. All associated data will be lost.</p>
+            </div>
+        </div>
+
+        <!-- Форма удаления -->
+        <form method="post" class="delete-form">
+            {% csrf_token %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger" id="deleteBtn">
+                    <span class="btn-icon">🗑️</span>
+                    Yes, Delete Permanently
+                </button>
+                
+                <a href="{% url 'shopapp:product_details' product.pk %}" class="btn btn-secondary">
+                    <span class="btn-icon">←</span>
+                    No, Go Back
+                </a>
+
+                <a href="{% url 'shopapp:products_list' %}" class="btn btn-outline">
+                    <span class="btn-icon">📦</span>
+                    View All Products
+                </a>
+            </div>
+        </form>
+
+        <!-- Дополнительная информация -->
+        <div class="additional-info">
+            <div class="info-card">
+                <h3>📊 What will be deleted:</h3>
+                <ul>
+                    <li>Product information</li>
+                    <li>Pricing data</li>
+                    <li>Product description</li>
+                    <li>Any associations with orders</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtn = document.getElementById('deleteBtn');
+    const form = document.querySelector('.delete-form');
+    
+    // Подтверждение при отправке формы
+    form.addEventListener('submit', function(e) {
+        const confirmed = confirm('Are you absolutely sure you want to delete this product? This action cannot be undone!');
+        if (!confirmed) {
+            e.preventDefault();
+        } else {
+            // Анимация кнопки при подтверждении
+            deleteBtn.innerHTML = `
+                <span class="btn-icon">⏳</span>
+                Deleting...
+            `;
+            deleteBtn.disabled = true;
+        }
+    });
+
+    // Анимация кнопок
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+{% endblock %}

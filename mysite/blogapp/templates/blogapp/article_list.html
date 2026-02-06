@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    TechStore - {% block subtitle %}Все статьи{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'blogapp/css/blog.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="articles-page">
+    <!-- Заголовок страницы -->
+    <div class="page-header">
+        <h1 class="page-title">Статьи блога</h1>
+        <p class="page-subtitle">Всего статей: {{ articles|length }}</p>
+        
+        <!-- Фильтры (опционально) -->
+        <div class="page-filters">
+            <a href="?sort=newest" class="filter-btn">Сначала новые</a>
+            <a href="?sort=oldest" class="filter-btn">Сначала старые</a>
+        </div>
+    </div>
+
+    <!-- Список статей -->
+    <div class="articles-container">
+        {% if articles %}
+            {% for article in articles %}
+            <article class="article-card">
+                <!-- Заголовок статьи -->
+                <div class="article-header">
+                    <h2 class="article-title">
+                        <a href="#" class="article-link">
+                            {{ article.title }}
+                        </a>
+                    </h2>
+                    
+                    <!-- Мета-информация -->
+                    <div class="article-meta">
+                        <span class="meta-item">
+                            <i class="meta-icon">📅</i>
+                            {{ article.pub_date|date:"d.m.Y H:i" }}
+                        </span>
+                        
+                        {% if article.author %}
+                        <span class="meta-item">
+                            <i class="meta-icon">👤</i>
+                            {{ articles.author.name }}
+                        </span>
+                        {% endif %}
+                        
+                        {% if article.category %}
+                        <span class="meta-item">
+                            <i class="meta-icon">📁</i>
+                            {{ article.category.name }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Краткое содержание -->
+                <div class="article-content">
+                    <p class="article-excerpt">
+                        {{ article.content_short }}
+                    </p>
+                </div>
+
+                <!-- Теги -->
+                {% if article.tags.all %}
+                <div class="article-tags">
+                    <span class="tags-label">Теги:</span>
+                    <div class="tags-container">
+                        {% for tag in article.tags.all %}
+                        <a href="#" class="tag">
+                            {{ tag.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Читать далее -->
+                <div class="article-footer">
+                    <a href="{% url 'blogapp:article' article.pk %}" class="read-more">
+                        Читать далее →
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        {% else %}
+            <!-- Сообщение если нет статей -->
+            <div class="no-articles">
+                <h3>Статьи пока не опубликованы</h3>
+                <p>Загляните сюда позже или свяжитесь с автором.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Пагинация (если включена в view) -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="page-link">« Первая</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="page-link">‹ Назад</a>
+        {% endif %}
+
+        <span class="current-page">
+            Страница {{ page_obj.number }} из {{ paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">Вперед ›</a>
+            <a href="?page={{ paginator.num_pages }}" class="page-link">Последняя »</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Анимация появления статей
+    const articles = document.querySelectorAll('.article-card');
+    articles.forEach((article, index) => {
+        setTimeout(() => {
+            article.style.opacity = '1';
+            article.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+
+    // Подсветка текущей страницы в пагинации
+    const currentUrl = window.location.href;
+    document.querySelectorAll('.page-link').forEach(link => {
+        if (link.href === currentUrl) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+{% endblock %}

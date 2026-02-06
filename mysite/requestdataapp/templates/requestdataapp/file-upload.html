@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    File Upload Demo
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'requestdataapp/css/file-upload.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="upload-container">
+    <!-- Header Section -->
+    <div class="upload-header">
+        <h1 class="upload-title">📁 File Upload</h1>
+        <p class="upload-subtitle">Upload files to the server with Django</p>
+    </div>
+
+    <!-- Upload Form -->
+    <div class="upload-card">
+        {% if error_size %}
+            <p class="error-message">
+                ⚠️ Ошибка загрузки: файл превышает 1 МБ. Уменьшите размер или загрузите другой файл
+            </p>
+        {% endif %}
+
+        <div class="card-header">
+            <h2>Select File to Upload</h2>
+            <p class="card-description">Choose any file from your computer</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+            {% csrf_token %}
+
+            <div class="file-input-container">
+               {{ form.file }}
+                <label for="fileInput" class="file-input-label">
+                    <span class="file-icon">📎</span>
+                    <span class="file-text">Choose a file...</span>
+                    <span class="file-browse">Browse Files</span>
+                </label>
+                <div class="file-preview" id="filePreview">
+                    <div class="preview-placeholder">
+                        <span class="preview-icon">👆</span>
+                        <p>No file selected</p>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="upload-button">
+                <span class="button-icon">🚀</span>
+                Upload to Server
+            </button>
+        </form>
+    </div>
+
+    <!-- Upload Results -->
+    {% if uploaded_file %}
+    <div class="result-card success">
+        <div class="result-header">
+            <span class="result-icon">✅</span>
+            <h3>File Uploaded Successfully!</h3>
+        </div>
+        <div class="result-details">
+            <div class="detail-row">
+                <span class="detail-label">Original Name:</span>
+                <span class="detail-value">{{ uploaded_file.name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Saved As:</span>
+                <span class="detail-value">{{ uploaded_file.saved_name }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">File Size:</span>
+                <span class="detail-value">{{ uploaded_file.size|filesizeformat }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">File Type:</span>
+                <span class="detail-value">{{ uploaded_file.content_type }}</span>
+            </div>
+            {% if uploaded_file.url %}
+            <div class="detail-row">
+                <span class="detail-label">Storage URL:</span>
+                <span class="detail-value">{{ uploaded_file.url }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Features Info -->
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🛡️</div>
+            <h4>Secure Upload</h4>
+            <p>Protected with CSRF tokens and Django security features</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">💾</div>
+            <h4>File Storage</h4>
+            <p>Files are safely stored using Django's FileSystemStorage</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h4>File Info</h4>
+            <p>Get detailed information about uploaded files</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('fileInput');
+        const filePreview = document.getElementById('filePreview');
+        const fileText = document.querySelector('.file-text');
+        const form = document.getElementById('uploadForm');
+
+        fileInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
+
+                fileText.textContent = file.name;
+
+                // Update file preview
+                filePreview.innerHTML = `
+                    <div class="file-info">
+                        <div class="file-info-item">
+                            <strong>File:</strong> ${file.name}
+                        </div>
+                        <div class="file-info-item">
+                            <strong>Size:</strong> ${fileSize} MB
+                        </div>
+                        <div class="file-info-item">
+                            <strong>Type:</strong> ${file.type || 'Unknown'}
+                        </div>
+                    </div>
+                `;
+
+                filePreview.classList.add('has-file');
+            } else {
+                fileText.textContent = 'Choose a file...';
+                filePreview.innerHTML = `
+                    <div class="preview-placeholder">
+                        <span class="preview-icon">👆</span>
+                        <p>No file selected</p>
+                    </div>
+                `;
+                filePreview.classList.remove('has-file');
+            }
+        });
+
+        // Form submission feedback
+        form.addEventListener('submit', function() {
+            const button = this.querySelector('.upload-button');
+            const originalText = button.innerHTML;
+
+            button.innerHTML = `
+                <span class="button-icon">⏳</span>
+                Uploading...
+            `;
+            button.disabled = true;
+
+            // Re-enable button after 3 seconds (in case of error)
+            setTimeout(() => {
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }, 3000);
+        });
+    });
+    </script>
+{% endblock %}

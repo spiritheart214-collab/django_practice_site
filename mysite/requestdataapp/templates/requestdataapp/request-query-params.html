@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    DEMO - Request Parameters
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'requestdataapp/css/request-params.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="request-container">
+    <div class="request-header">
+        <h1 class="request-title">{{ request.method }} Request Analysis</h1>
+        <p class="request-subtitle">Testing and debugging HTTP request parameters</p>
+    </div>
+
+    <div class="request-info-cards">
+        <!-- Card request-params.css: Request Method Info -->
+        <div class="info-card method-card">
+            <div class="card-header">
+                <h2>📡 Request Method</h2>
+            </div>
+            <div class="card-content">
+                <span class="method-badge {{ request.method|lower }}">{{ request.method }}</span>
+                <p class="method-description">
+                    {% if request.method == "GET" %}
+                    GET request - parameters are visible in URL
+                    {% elif request.method == "POST" %}
+                    POST request - parameters are in request body
+                    {% else %}
+                    {{ request.method }} request
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Card 2: All GET Parameters -->
+        <div class="info-card params-card">
+            <div class="card-header">
+                <h2>🔍 All GET Parameters</h2>
+            </div>
+            <div class="card-content">
+                <div class="params-display">
+                    <code class="get-params">{{ request.GET }}</code>
+                </div>
+                <p class="params-count">
+                    Total parameters: {{ request.GET|length }}
+                </p>
+            </div>
+        </div>
+
+        <!-- Card 3: Specific Parameter 'name' -->
+        <div class="info-card specific-param-card">
+            <div class="card-header">
+                <h2>👤 Parameter 'name'</h2>
+            </div>
+            <div class="card-content">
+                {% if request.GET.name %}
+                <div class="param-value">
+                    <span class="param-label">Value:</span>
+                    <span class="param-data">{{ request.GET.name }}</span>
+                </div>
+                {% else %}
+                <div class="param-missing">
+                    <span class="warning-icon">⚠️</span>
+                    Parameter 'name' not provided
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Results Section -->
+    <div class="test-results">
+        <h2 class="results-title">🧪 Test Results</h2>
+
+        <div class="results-grid">
+            <div class="result-item">
+                <div class="result-label">Parameter A</div>
+                <div class="result-value {% if not a %}empty{% endif %}">
+                    {{ a|default:"Not provided" }}
+                </div>
+            </div>
+
+            <div class="result-item">
+                <div class="result-label">Parameter B</div>
+                <div class="result-value {% if not b %}empty{% endif %}">
+                    {{ b|default:"Not provided" }}
+                </div>
+            </div>
+
+            <div class="result-item highlight">
+                <div class="result-label">Concatenation Result</div>
+                <div class="result-value {% if not result %}empty{% endif %}">
+                    {{ result|default:"No data to concatenate" }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testing Instructions -->
+    <div class="testing-instructions">
+        <h3>🎯 How to Test</h3>
+        <div class="instructions-content">
+            <p>Add parameters to your URL to see them here:</p>
+            <div class="example-urls">
+                <code class="url-example">
+                    http://127.0.0.1:8000/your-path/?a=hello&b=world
+                </code>
+                <code class="url-example">
+                    http://127.0.0.1:8000/your-path/?name=John&a=test&b=123
+                </code>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

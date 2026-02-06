@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% block subtitle %}
+        {{ article.title }} | TechStore Blog
+    {% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'blogapp/css/article_detail.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="article-detail">
+    
+    <!-- Заголовок статьи -->
+    <header class="article-header">
+        <h1 class="article-title">{{ article.title }}</h1>
+        
+        <div class="article-meta">
+            {% if article.author %}
+                <span class="author-info">
+                    <strong>Автор:</strong> 
+                    <a href="#" class="author-link">{{ article.author.name }}</a>
+                </span>
+            {% endif %}
+            
+            {% if article.pub_date %}
+                <span class="publish-date">
+                    <strong>Опубликовано:</strong> 
+                    {{ article.pub_date|date:"d.m.Y H:i" }}
+                </span>
+            {% endif %}
+            
+            {% if article.category %}
+                <span class="category-badge">
+                    <strong>Категория:</strong> 
+                    <a href="#" class="category-link">{{ article.category.name }}</a>
+                </span>
+            {% endif %}
+        </div>
+    </header>
+
+    <!-- Теги статьи -->
+    {% if article.tags.all %}
+    <div class="article-tags">
+        <strong>Теги:</strong>
+        {% for tag in article.tags.all %}
+            <a href="#" class="tag">{{ tag.name }}</a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Краткая биография автора -->
+    {% if article.author and article.author.short_bio %}
+    <div class="author-bio info-section">
+        <h3>Об авторе</h3>
+        <p>{{ article.author.short_bio }}</p>
+        {% if article.author.bio and article.author.bio|length > 100 %}
+            <a href="#" class="read-more">Читать полную биографию →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Контент статьи -->
+    <article class="article-content">
+        {% if article.content %}
+            <div class="content-text">
+                {{ article.content|linebreaks }}
+            </div>
+        {% else %}
+            <div class="no-content">
+                <p>К сожалению, контент этой статьи пока отсутствует.</p>
+            </div>
+        {% endif %}
+    </article>
+
+    <!-- Дополнительная информация -->
+    <div class="article-footer">
+        <div class="article-info">
+            {% if article.pub_date %}
+                <p><strong>Дата публикации:</strong> {{ article.pub_date|date:"d.m.Y" }}</p>
+            {% else %}
+                <p><strong>Статья еще не опубликована</strong></p>
+            {% endif %}
+            
+            {% if article.category %}
+                <p><strong>Категория:</strong> {{ article.category.name }}</p>
+            {% endif %}
+        </div>
+        
+        <div class="article-actions">
+            <a href="{% url 'blogapp:articles' %}" class="btn-back">← К списку статей</a>
+            <!-- Можно добавить другие действия -->
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+

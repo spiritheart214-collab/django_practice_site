@@ -1,0 +1,33 @@
+[
+  {
+    "model": "shopapp.order",
+    "pk": 1,
+    "fields": {
+      "delivery_adress": "SPASSKAYA 3",
+      "promocode": "SALE",
+      "created_at": "2025-11-07T16:52:53.756Z",
+      "user": 1,
+      "products": [
+        2,
+        5,
+        1,
+        3,
+        4
+      ]
+    }
+  },
+  {
+    "model": "shopapp.order",
+    "pk": 2,
+    "fields": {
+      "delivery_adress": "DZFS 15",
+      "promocode": "DZFS 15",
+      "created_at": "2025-11-19T10:08:57.354Z",
+      "user": 1,
+      "products": [
+        2,
+        8
+      ]
+    }
+  }
+]

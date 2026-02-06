@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ shop_name|default:"TechStore" }} - Заказы пользователя {{ owner.username }}
+{% endblock %}
+
+{% block subtitle %}
+    Заказы пользователя {{ owner.username }}
+{% endblock %}
+
+
+{% load static %}
+{% load cache %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'shopapp/css/user_orders_list.css' %}">
+
+{% endblock %}
+
+{% block main %}
+    <!-- Шапка страницы -->
+    <div class="page-header">
+        <h1>Заказы пользователя</h1>
+    </div>
+
+    <!-- Блок 1: Информация о пользователе -->
+    <div class="user-section">
+        <div class="user-header">
+            <div class="user-avatar">
+                {{ owner.username|first|upper }}
+            </div>
+            <div class="user-info">
+                <div class="user-name">
+                    {{ owner.username }}
+                    {% if request.user == owner %}
+                        <span class="status-badge badge-owner">Вы</span>
+                    {% elif request.user.is_staff %}
+                        <span class="status-badge badge-staff">Админ</span>
+                    {% endif %}
+                </div>
+                <div class="user-email">{{ owner.email|default:"Email не указан" }}</div>
+            </div>
+        </div>
+
+        <div class="user-meta">
+            <div class="meta-item">
+                <span class="meta-label">ID пользователя</span>
+                <span class="meta-value">#{{ owner.id }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Всего заказов</span>
+                <span class="meta-value">{{ orders_count }}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Статус</span>
+                <span class="meta-value">
+                    {% if owner.is_active %}Активен{% else %}Неактивен{% endif %}
+                </span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Тип аккаунта</span>
+                <span class="meta-value">
+                    {% if owner.is_staff %}Staff{% else %}User{% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Блок 2: Заголовок раздела заказов -->
+    <h2 class="orders-title">Список заказов</h2>
+
+    {% cache 300 "user_order_cache"  owner.id%}
+        <!-- Блок 3: Список заказов -->
+        {% if user_orders %}
+            {% for order in user_orders %}
+                <div class="order-block">
+                    <!-- Заголовок заказа -->
+                    <div class="order-header">
+                        <div class="order-number">Заказ #{{ order.id }}</div>
+                        <div class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</div>
+                    </div>
+
+                    <!-- Детали заказа -->
+                    <div class="order-details">
+                        <div class="detail-field">
+                            <span class="detail-label">Адрес доставки</span>
+                            <div class="detail-value {% if not order.delivery_adress %}empty{% endif %}">
+                                {{ order.delivery_adress|default:"Не указан" }}
+                            </div>
+                        </div>
+
+                        <div class="detail-field">
+                            <span class="detail-label">Промокод</span>
+                            <div class="detail-value {% if not order.promocode %}empty{% endif %}">
+                                {{ order.promocode|default:"Не использован" }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Продукты в заказе -->
+                    <div class="products-header">
+                        Товары в заказе ({{ order.products.count }})
+                    </div>
+
+                    <div class="products-list">
+                        {% for product in order.products.all %}
+                            <div class="product-item">
+                                <div class="product-name">{{ product.name }}</div>
+                                <div class="product-price">${{ product.price }}</div>
+                                {% if product.description %}
+                                    <div class="product-meta">{{ product.description|truncatechars:60 }}</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-orders">
+                <div class="empty-icon">📭</div>
+                <h3>Заказов нет</h3>
+                <p>У этого пользователя пока не было заказов</p>
+            </div>
+        {% endif %}
+    {% endcache %}
+{% endblock %}

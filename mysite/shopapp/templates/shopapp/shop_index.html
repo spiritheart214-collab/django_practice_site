@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ shop_name }} - {% block subtitle %}Welcome to Our Store{% endblock %}
+{% endblock %}
+
+{% load static %}
+{% load cache %}
+
+{% block extra_css %}
+    <!-- 👇 Подключаем специфичные стили для магазина -->
+    <link rel="stylesheet" href="{% static 'shopapp/css/shop_index.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="info-section">
+        <h1>Welcome to {{ shop_name|upper }} !</h1>
+        <p>Your one-stop destination for the latest technology products</p>
+    </div>
+
+    <div class="time-info">
+        <h3>Performance Info</h3>
+        <p>Time running: <strong>{{ time_running|floatformat:2 }}</strong> seconds</p>
+    </div>
+
+    <div class="current-time">
+        <h3>Current Time</h3>
+        {% now 'l' as current_weekday %}
+        {% now 'H:i' as current_time %}
+        <p>Today is <strong>{{ current_weekday|title }}</strong> and the time is <strong>{{ current_time }}</strong></p>
+    </div>
+
+    <h2>Our Products</h2>
+    <div class="products-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <div class="product-name">{{ product.0|truncatewords:2 }}</div>
+                <div class="product-price">${{ product.1|stringformat:"d" }}</div>
+                <p>High-quality {{ product.0|lower }} with excellent features</p>
+            </div>
+        {% empty %}
+            <p>No products available at the moment.</p>
+        {% endfor %}
+    </div>
+
+    {% cache 100 lorem %}
+        <div class="info-section">
+            <h3>About Us</h3>
+            <p>{% lorem 2 p random %}</p>
+        </div>
+    {% endcache %}
+
+{% endblock %}

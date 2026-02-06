@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Update product
+{% endblock %}
+
+{% block extra_css %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'shopapp/css/create-product.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="create-product-container">
+    <h1>Update Product</h1>
+    
+    <form method="post" class="create-product-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="submit-button">Update</button>
+    </form>
+
+    <div class="back-link">
+        <a href="{% url 'shopapp:product_details' pk=product.pk %}">← Back to Product Details</a>
+    </div>
+</div>
+{% endblock %}

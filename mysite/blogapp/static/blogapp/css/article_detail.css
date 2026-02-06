@@ -1,0 +1,174 @@
+<style>
+    /* Специфичные стили для страницы статьи */
+
+    .article-detail {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+
+    .article-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .article-title {
+        font-size: 2.5rem;
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .article-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        font-size: 0.95rem;
+        color: #666;
+    }
+
+    .article-meta span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .author-link, .category-link {
+        color: #667eea;
+        text-decoration: none;
+        transition: color 0.3s;
+    }
+
+    .author-link:hover, .category-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
+    .article-tags {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .article-tags .tag {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        margin: 0.3rem;
+        background: #667eea;
+        color: white;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: background 0.3s;
+    }
+
+    .article-tags .tag:hover {
+        background: #764ba2;
+    }
+
+    .author-bio {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        background: #e8f4fd;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+    }
+
+    .author-bio h3 {
+        color: #2c3e50;
+        margin-bottom: 0.5rem;
+    }
+
+    .read-more {
+        display: inline-block;
+        margin-top: 0.5rem;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .read-more:hover {
+        text-decoration: underline;
+    }
+
+    .article-content {
+        margin: 2rem 0;
+        line-height: 1.8;
+        font-size: 1.1rem;
+    }
+
+    .content-text {
+        padding: 1.5rem;
+        background: #fafafa;
+        border-radius: 8px;
+    }
+
+    .no-content {
+        padding: 3rem;
+        text-align: center;
+        background: #fff3cd;
+        border-radius: 8px;
+        color: #856404;
+    }
+
+    .article-footer {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 2px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .article-info {
+        color: #666;
+        font-size: 0.95rem;
+    }
+
+    .article-info p {
+        margin: 0.3rem 0;
+    }
+
+    .btn-back {
+        display: inline-block;
+        padding: 0.7rem 1.5rem;
+        background: #667eea;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-back:hover {
+        background: #764ba2;
+        transform: translateX(-5px);
+    }
+
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .article-detail {
+            padding: 1rem;
+        }
+
+        .article-title {
+            font-size: 1.8rem;
+        }
+
+        .article-meta {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .article-footer {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>

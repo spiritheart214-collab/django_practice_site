@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Delete Order #{{ object.pk }} - {% block subtitle %}Confirm Deletion{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shopapp/css/order_delete_confirm.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="delete-confirm-container">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="{% url 'shopapp:orders_list' %}">Orders</a>
+        <span class="separator">/</span>
+        <span class="current">Delete Order #{{ object.pk }}</span>
+    </nav>
+
+    <!-- Основной контент -->
+    <div class="delete-card">
+        <div class="warning-header">
+            <div class="warning-icon">🗑️</div>
+            <h1 class="warning-title">Delete Order</h1>
+            <div class="order-id">#{{ object.pk }}</div>
+        </div>
+
+        <!-- Информация о заказе -->
+        <div class="order-preview">
+            <div class="order-info-grid">
+                <div class="info-section">
+                    <h3>👤 Customer Information</h3>
+                    <div class="customer-card">
+                        <div class="customer-avatar">
+                            {{ object.user.username|first|upper }}
+                        </div>
+                        <div class="customer-details">
+                            <strong class="username">{{ object.user.username }}</strong>
+                            <span class="user-email">{{ object.user.email|default:"No email" }}</span>
+                            <span class="user-fullname">
+                                {% if object.user.first_name or object.user.last_name %}
+                                    {{ object.user.first_name }} {{ object.user.last_name }}
+                                {% else %}
+                                    No name provided
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>📦 Order Details</h3>
+                    <div class="details-list">
+                        <div class="detail-item">
+                            <span class="label">Created:</span>
+                            <span class="value">{{ object.created_at|date:"M d, Y H:i" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Products:</span>
+                            <span class="value">{{ object.products.count }} items</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Delivery Address:</span>
+                            <span class="value">
+                                {% if object.delivery_adress %}
+                                    {{ object.delivery_adress|truncatewords:10 }}
+                                {% else %}
+                                    <em>Not specified</em>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Promocode:</span>
+                            <span class="value">
+                                {% if object.promocode %}
+                                    <span class="promocode-badge">{{ object.promocode }}</span>
+                                {% else %}
+                                    <em>No promocode</em>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Список товаров в заказе -->
+            <div class="products-section">
+                <h3>🛍️ Products in this order ({{ object.products.count }}):</h3>
+                {% if object.products.all %}
+                <div class="products-mini-list">
+                    {% for product in object.products.all %}
+                    <div class="product-mini-item">
+                        <span class="product-name">{{ product.name }}</span>
+                        <span class="product-price">${{ product.price }}</span>
+                        {% if product.discount %}
+                        <span class="product-discount">-{{ product.discount }}%</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-products">
+                    <span class="no-products-icon">📦</span>
+                    <span>No products in this order</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Предупреждение -->
+        <div class="warning-message">
+            <div class="alert alert-danger">
+                <strong>⚠️ Critical Warning: This action cannot be undone!</strong>
+                <p>You are about to permanently delete this order. All order data, including customer information and product associations, will be lost forever.</p>
+            </div>
+        </div>
+
+        <!-- Форма удаления -->
+        <form method="post" class="delete-form">
+            {% csrf_token %}
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger" id="deleteBtn">
+                    <span class="btn-icon">🗑️</span>
+                    Yes, Delete This Order Permanently
+                </button>
+                
+                <div class="secondary-actions">
+                    <a href="{% url 'shopapp:orders_list' %}" class="btn btn-secondary">
+                        <span class="btn-icon">←</span>
+                        No, Back to Orders List
+                    </a>
+                    
+                    {% if object.pk %}
+                    <a href="{% url 'shopapp:order_details' object.pk %}" class="btn btn-outline">
+                        <span class="btn-icon">👁️</span>
+                        View Order Details
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+
+        <!-- Дополнительная информация -->
+        <div class="additional-info">
+            <div class="info-card">
+                <h3>📊 What will be deleted:</h3>
+                <ul>
+                    <li>Order information and metadata</li>
+                    <li>Customer association data</li>
+                    <li>Product associations in this order</li>
+                    <li>Delivery address information</li>
+                    <li>Promocode usage record</li>
+                </ul>
+            </div>
+
+            <div class="info-card warning-card">
+                <h3>🚨 Important Note:</h3>
+                <p>Deleting this order will <strong>not</strong> delete the associated products or user account. Only the order record itself will be removed.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteBtn = document.getElementById('deleteBtn');
+    const form = document.querySelector('.delete-form');
+    
+    // Подтверждение при отправке формы
+    form.addEventListener('submit', function(e) {
+        const confirmed = confirm('ARE YOU ABSOLUTELY SURE?\n\nThis will permanently delete Order #{{ object.pk }} for customer "{{ object.user.username }}". This action cannot be undone!');
+        if (!confirmed) {
+            e.preventDefault();
+        } else {
+            // Анимация кнопки при подтверждении
+            deleteBtn.innerHTML = `
+                <span class="btn-icon">⏳</span>
+                Deleting Order...
+            `;
+            deleteBtn.disabled = true;
+            
+            // Блокируем все кнопки
+            document.querySelectorAll('.btn').forEach(btn => {
+                if (btn !== deleteBtn) btn.disabled = true;
+            });
+        }
+    });
+
+    // Анимация кнопок
+    const buttons = document.querySelectorAll('.btn');
+    buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            if (!this.disabled) {
+                this.style.transform = 'translateY(-2px)';
+            }
+        });
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Подсветка при наведении на карточку заказа
+    const orderPreview = document.querySelector('.order-preview');
+    orderPreview.addEventListener('mouseenter', function() {
+        this.style.borderColor = '#dc2626';
+    });
+    orderPreview.addEventListener('mouseleave', function() {
+        this.style.borderColor = '#e2e8f0';
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Create Order - {% block subtitle %}New Order{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'shopapp/css/create-order.css' %}">
+{% endblock %}
+
+{% block main %}
+<div class="order-form-container">
+    <div class="form-header">
+        <h1 class="form-title">📦 Создание заказа</h1>
+        <p class="form-subtitle">Заполните информацию о заказе</p>
+    </div>
+
+    <form method="post" class="order-form" id="orderForm">
+        {% csrf_token %}
+        
+        <!-- Поле: Адрес доставки -->
+        <div class="form-group">
+            <label for="{{ form.delivery_adress.id_for_label }}" class="form-label">
+                <span class="label-icon">📍</span>
+                {{ form.delivery_adress.label }}
+            </label>
+            {{ form.delivery_adress }}
+            {% if form.delivery_adress.errors %}
+                <div class="error-message">
+                    {% for error in form.delivery_adress.errors %}
+                        <span class="error-icon">⚠️</span> {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="input-hint">Укажите полный адрес доставки</div>
+        </div>
+
+        <!-- Поле: Промокод -->
+        <div class="form-group">
+            <label for="{{ form.promocode.id_for_label }}" class="form-label">
+                <span class="label-icon">🎫</span>
+                {{ form.promocode.label }}
+            </label>
+            {{ form.promocode }}
+            {% if form.promocode.errors %}
+                <div class="error-message">
+                    {% for error in form.promocode.errors %}
+                        <span class="error-icon">⚠️</span> {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="input-hint">Необязательное поле</div>
+        </div>
+
+        <!-- Поле: Пользователь -->
+        <div class="form-group">
+            <label for="{{ form.user.id_for_label }}" class="form-label">
+                <span class="label-icon">👤</span>
+                {{ form.user.label }}
+            </label>
+            {{ form.user }}
+            {% if form.user.errors %}
+                <div class="error-message">
+                    {% for error in form.user.errors %}
+                        <span class="error-icon">⚠️</span> {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="input-hint">Выберите пользователя для заказа</div>
+        </div>
+
+        <!-- Поле: Товары -->
+        <div class="form-group">
+            <label for="{{ form.products.id_for_label }}" class="form-label">
+                <span class="label-icon">🛍️</span>
+                {{ form.products.label }}
+            </label>
+            {{ form.products }}
+            {% if form.products.errors %}
+                <div class="error-message">
+                    {% for error in form.products.errors %}
+                        <span class="error-icon">⚠️</span> {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="input-hint">
+                Удерживайте Ctrl (Cmd на Mac) для выбора нескольких товаров. 
+                Максимум 10 товаров.
+            </div>
+        </div>
+
+        <!-- Кнопка отправки -->
+        <button type="submit" class="submit-button">
+            <span class="button-icon">🚀</span>
+            Создать заказ
+        </button>
+    </form>
+
+    <!-- Ссылка назад -->
+    <div class="back-link">
+        <a href="{% url 'shopapp:orders_list' %}" class="back-button">
+            <span class="back-icon">←</span>
+            Вернуться к заказам
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('orderForm');
+    const productsSelect = document.getElementById('{{ form.products.id_for_label }}');
+    
+    // Подсчет выбранных товаров
+    if (productsSelect) {
+        productsSelect.addEventListener('change', function() {
+            const selectedCount = Array.from(this.selectedOptions).length;
+            const counter = document.getElementById('products-counter') || 
+                           createProductsCounter();
+            
+            counter.textContent = `Выбрано товаров: ${selectedCount}/10`;
+            
+            if (selectedCount > 10) {
+                counter.classList.add('error');
+            } else {
+                counter.classList.remove('error');
+            }
+        });
+        
+        function createProductsCounter() {
+            const counter = document.createElement('div');
+            counter.id = 'products-counter';
+            counter.className = 'products-counter';
+            productsSelect.parentNode.appendChild(counter);
+            return counter;
+        }
+    }
+    
+    // Анимация отправки формы
+    form.addEventListener('submit', function() {
+        const button = this.querySelector('.submit-button');
+        const originalText = button.innerHTML;
+        
+        button.innerHTML = `
+            <span class="button-icon">⏳</span>
+            Создание заказа...
+        `;
+        button.disabled = true;
+        
+        setTimeout(() => {
+            button.disabled = false;
+            button.innerHTML = originalText;
+        }, 5000);
+    });
+});
+</script>
+{% endblock %}

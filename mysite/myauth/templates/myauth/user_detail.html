@@ -1,0 +1,568 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User: {{ profile.user.username }}{% endblock %}
+
+{% block main %}
+<div class="user-detail">
+    <!-- Хлебные крошки -->
+    <nav class="breadcrumbs">
+        <a href="{% url 'myauth:user_list' %}">Users List</a>
+        <span class="separator">/</span>
+        <span class="current">{{ profile.user.username }}</span>
+    </nav>
+
+    <div class="profile-header">
+        <h1>User Profile</h1>
+    </div>
+
+    <div class="profile-content">
+        <!-- Аватарка -->
+        <div class="avatar-section">
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}"
+                     alt="{{ profile.user.username }}'s avatar"
+                     class="profile-avatar">
+            {% else %}
+                <div class="no-avatar-large">
+                    {{ profile.user.username|first|upper }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Информация о пользователе -->
+        <div class="profile-info">
+            <h2>
+                {% if profile.user.get_full_name %}
+                    {{ profile.user.get_full_name }}
+                {% else %}
+                    {{ profile.user.username }}
+                {% endif %}
+            </h2>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value">@{{ profile.user.username }}</span>
+                </div>
+
+                {% if profile.user.email %}
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ profile.user.email }}</span>
+                </div>
+                {% endif %}
+
+                <div class="info-item">
+                    <span class="info-label">Member since:</span>
+                    <span class="info-value">{{ profile.user.date_joined|date:"F d, Y" }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Last login:</span>
+                    <span class="info-value">
+                        {% if profile.user.last_login %}
+                            {{ profile.user.last_login|date:"F d, Y H:i" }}
+                        {% else %}
+                            Never
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% if profile.bio %}
+                <div class="info-item full-width">
+                    <span class="info-label">Bio:</span>
+                    <span class="info-value">{{ profile.bio }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- ФОРМА ИЗМЕНЕНИЯ - ТОЛЬКО для админов -->
+            {% if user.is_staff %}
+            <div class="admin-form-section">
+                <h3><i class="fas fa-user-shield"></i> Admin: Change Avatar</h3>
+                <form method="post" enctype="multipart/form-data" class="avatar-form" id="adminAvatarForm">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <div class="file-input-wrapper">
+                            <input type="file"
+                                   name="avatar"
+                                   id="adminAvatarInput"
+                                   accept="image/*"
+                                   onchange="updateFileName(this)"
+                                   class="file-input">
+                            <label for="adminAvatarInput" class="custom-file-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <span>Choose Avatar File</span>
+                            </label>
+                        </div>
+                        <div class="file-name" id="fileName">No file selected</div>
+
+                        <div class="file-hint">
+                            <i class="fas fa-info-circle"></i>
+                            Max size: 5MB • Formats: JPG, PNG, GIF, WebP
+                        </div>
+
+                        <div class="preview-container">
+                            <div class="preview-label">Preview:</div>
+                            <img id="adminAvatarPreview" class="avatar-preview" src="" alt="Preview">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-admin-primary">
+                            <i class="fas fa-save"></i> Update Avatar
+                        </button>
+
+                        {% if profile.avatar %}
+                        <button type="button" class="btn-admin-secondary" onclick="confirmRemoveAvatar('{{ profile.pk }}')">
+                            <i class="fas fa-trash-alt"></i> Remove Avatar
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+
+            <!-- Кнопка назад -->
+            <a href="{% url 'myauth:user_list' %}" class="back-btn">
+                ← Back to Users List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .user-detail {
+        padding: 2rem 0;
+    }
+
+    .breadcrumbs {
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .breadcrumbs a {
+        color: #3b82f6;
+        text-decoration: none;
+    }
+
+    .breadcrumbs a:hover {
+        text-decoration: underline;
+    }
+
+    .breadcrumbs .separator {
+        margin: 0 0.5rem;
+        color: #9ca3af;
+    }
+
+    .profile-header {
+        margin-bottom: 2rem;
+    }
+
+    .profile-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        gap: 3rem;
+        align-items: flex-start;
+    }
+
+    .avatar-section {
+        flex-shrink: 0;
+    }
+
+    .profile-avatar {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 6px solid #3b82f6;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .no-avatar-large {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+        font-weight: bold;
+        border: 6px solid #3b82f6;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-info h2 {
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        padding: 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .info-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: #374151;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        color: #6b7280;
+    }
+
+    .back-btn {
+        display: inline-block;
+        background: #f3f4f6;
+        color: #374151;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+    }
+
+    .back-btn:hover {
+        background: #e5e7eb;
+        border-color: #d1d5db;
+    }
+
+    /* Стили для админ формы */
+    .admin-form-section {
+        margin: 2.5rem 0;
+        padding: 1.8rem;
+        background: linear-gradient(135deg, #f0f7ff 0%, #f9f0ff 100%);
+        border-radius: 12px;
+        border: 2px solid #dbeafe;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    }
+
+    .admin-form-section h3 {
+        color: #1e40af;
+        margin-bottom: 1.5rem;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #dbeafe;
+    }
+
+    .admin-form-section h3 i {
+        color: #3b82f6;
+    }
+
+    .avatar-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        width: 100%;
+    }
+
+    .file-input {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        z-index: 2;
+    }
+
+    .custom-file-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background: white;
+        border: 2px dashed #93c5fd;
+        border-radius: 10px;
+        color: #1e40af;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        justify-content: center;
+    }
+
+    .custom-file-label:hover {
+        background: #eff6ff;
+        border-color: #3b82f6;
+        border-style: solid;
+        transform: translateY(-2px);
+    }
+
+    .custom-file-label:active {
+        transform: translateY(0);
+    }
+
+    .custom-file-label i {
+        font-size: 1.2rem;
+    }
+
+    .file-name {
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+        color: #6b7280;
+        padding: 0.5rem 0;
+    }
+
+    .file-hint {
+        font-size: 0.85rem;
+        color: #9ca3af;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: #f9fafb;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .file-hint i {
+        color: #3b82f6;
+    }
+
+    .preview-container {
+        text-align: center;
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .preview-label {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+    }
+
+    .avatar-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #10b981;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+        display: none;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-admin-primary {
+        flex: 1;
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        padding: 0.9rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .btn-admin-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-admin-primary:active {
+        transform: translateY(0);
+    }
+
+    .btn-admin-secondary {
+        flex: 1;
+        background: white;
+        color: #dc2626;
+        border: 2px solid #fca5a5;
+        padding: 0.9rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .btn-admin-secondary:hover {
+        background: #fee2e2;
+        border-color: #f87171;
+        color: #b91c1c;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    }
+
+    .btn-admin-secondary:active {
+        transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+        .profile-content {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 2rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .admin-form-section {
+            padding: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-admin-primary,
+        .btn-admin-secondary {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Показ имени файла
+function updateFileName(input) {
+    const fileName = document.getElementById('fileName');
+    const preview = document.getElementById('adminAvatarPreview');
+
+    if (input.files.length > 0) {
+        fileName.textContent = input.files[0].name;
+        fileName.style.color = '#1e40af';
+        fileName.style.fontWeight = '500';
+
+        // Показ превью
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        fileName.textContent = 'No file selected';
+        fileName.style.color = '#6b7280';
+        fileName.style.fontWeight = 'normal';
+        preview.style.display = 'none';
+    }
+}
+
+// Подтверждение удаления аватара
+function confirmRemoveAvatar(profileId) {
+    if (confirm('Are you sure you want to remove this avatar? The user will lose their profile picture.')) {
+        // Создаем скрытую форму для удаления
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = window.location.href;
+
+        const csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrfmiddlewaretoken';
+        csrf.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        const removeInput = document.createElement('input');
+        removeInput.type = 'hidden';
+        removeInput.name = 'remove_avatar';
+        removeInput.value = 'true';
+
+        form.appendChild(csrf);
+        form.appendChild(removeInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Валидация формы
+document.getElementById('adminAvatarForm').addEventListener('submit', function(e) {
+    const fileInput = document.getElementById('adminAvatarInput');
+
+    if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+        if (file.size > maxSize) {
+            e.preventDefault();
+            alert('❌ File is too large. Maximum size is 5MB.');
+            fileInput.value = '';
+            updateFileName(fileInput);
+            return false;
+        }
+
+        if (!allowedTypes.includes(file.type)) {
+            e.preventDefault();
+            alert('❌ Please upload an image file (JPEG, PNG, GIF, WebP).');
+            fileInput.value = '';
+            updateFileName(fileInput);
+            return false;
+        }
+    }
+    return true;
+});
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('adminAvatarInput');
+    if (fileInput) {
+        updateFileName(fileInput);
+    }
+});
+</script>
+{% endblock %}
